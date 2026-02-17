@@ -5,6 +5,7 @@ import { registerMoviesRoutes } from './handlers/registerMoviesRoutes'
 const app = new Hono()
 
 app.get('/health', (c) => {
+  console.log('Health check')
   return c.json({ status: 'ok' })
 })
 
@@ -13,5 +14,6 @@ registerMonolithRoutes(app)
 
 export default {
   port: process.env.PORT || 8000,
+  hostname: process.env.HOST || '0.0.0.0',
   fetch: app.fetch,
 }

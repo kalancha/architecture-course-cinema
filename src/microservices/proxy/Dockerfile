@@ -22,7 +22,7 @@ COPY tsconfig.json ./
 
 EXPOSE 8000
 
-CMD ["bun", "run", "dev"]
+CMD ["bun", "--watch", "src/index.ts"]
 
 FROM base AS production
 
@@ -35,4 +35,4 @@ COPY tsconfig.json ./
 
 EXPOSE 8000
 
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "src/index.ts"]
