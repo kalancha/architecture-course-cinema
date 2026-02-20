@@ -20,6 +20,7 @@ type User struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	Source   string `json:"source"`
 }
 
 type Movie struct {
@@ -28,6 +29,7 @@ type Movie struct {
 	Description string   `json:"description"`
 	Genres      []string `json:"genres"`
 	Rating      float64  `json:"rating"`
+	Source      string   `json:"source"`
 }
 
 type Payment struct {
@@ -35,6 +37,7 @@ type Payment struct {
 	UserID    int       `json:"user_id"`
 	Amount    float64   `json:"amount"`
 	Timestamp time.Time `json:"timestamp"`
+	Source    string    `json:"source"`
 }
 
 type Subscription struct {
@@ -43,6 +46,7 @@ type Subscription struct {
 	PlanType  string    `json:"plan_type"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`
+	Source    string    `json:"source"`
 }
 
 func main() {
@@ -120,6 +124,7 @@ func getAllUsers(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		u.Source = "monolith"
 		users = append(users, u)
 	}
 
@@ -136,6 +141,7 @@ func getUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	u.Source = "monolith"
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(u)
 }
@@ -209,6 +215,7 @@ func getAllMovies(w http.ResponseWriter, r *http.Request) {
 			genres = append(genres, genre)
 		}
 		m.Genres = genres
+		m.Source = "monolith"
 
 		movies = append(movies, m)
 	}
@@ -244,6 +251,7 @@ func getMovieByID(w http.ResponseWriter, r *http.Request) {
 		genres = append(genres, genre)
 	}
 	m.Genres = genres
+	m.Source = "monolith"
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(m)
@@ -322,6 +330,7 @@ func getAllPayments(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		p.Source = "monolith"
 		payments = append(payments, p)
 	}
 
@@ -338,6 +347,7 @@ func getPaymentByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	p.Source = "monolith"
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(p)
 }
@@ -358,6 +368,7 @@ func getPaymentsByUserID(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		p.Source = "monolith"
 		payments = append(payments, p)
 	}
 
@@ -418,6 +429,7 @@ func getAllSubscriptions(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		s.Source = "monolith"
 		subscriptions = append(subscriptions, s)
 	}
 
@@ -435,6 +447,7 @@ func getSubscriptionByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.Source = "monolith"
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s)
 }
@@ -455,6 +468,7 @@ func getSubscriptionsByUserID(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		s.Source = "monolith"
 		subscriptions = append(subscriptions, s)
 	}
 

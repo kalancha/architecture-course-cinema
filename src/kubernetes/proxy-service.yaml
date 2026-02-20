@@ -29,6 +29,12 @@ spec:
         env:
         - name: PORT
           value: "8000"
+        - name: GRADUAL_MIGRATION
+          value: "true"
+        - name: MOVIES_MIGRATION_PERCENT
+          value: "50"
+        - name: NODE_ENV
+          value: "production"
         envFrom:
         - configMapRef:
             name: cinemaabyss-config

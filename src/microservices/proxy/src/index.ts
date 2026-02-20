@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { registerMonolithRoutes } from './handlers/registerMonolithRoutes'
 import { registerMoviesRoutes } from './handlers/registerMoviesRoutes'
+import { registerEventsRoutes } from './handlers/registerEventsRoutes'
 
 const app = new Hono()
 
@@ -9,6 +10,7 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok' })
 })
 
+registerEventsRoutes(app)
 registerMoviesRoutes(app)
 registerMonolithRoutes(app)
 
