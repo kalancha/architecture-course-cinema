@@ -1,0 +1,70 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Диаграмма контейнеров [To-Be]: Микросервисная архитектура "Кинобездны"
+
+' ПОЛЬЗОВАТЕЛЬ
+Person(user, "Пользователь", "Мобильные устройства, Ноутбуки, Смарт ТВ")
+
+' ВНЕШНИЕ СИСТЕМЫ (ИЗ ТЕКУЩЕЙ СХЕМЫ)
+System_Ext(payment_sys, "Платёжная система", "Обработка транзакций")
+System_Ext(rec_sys, "Внешняя рек. система", "Подбор контента")
+System_Ext(s3, "S3 Storage", "Хранение видеофайлов")
+System_Ext(cinemas, "Онлайн-кинотеатры", "Внешние интеграции")
+
+' ГРАНИЦЫ СИСТЕМЫ
+System_Boundary(c1, "Система Кинобездны") {
+
+    ' API GATEWAY (Требование: GraphQL)
+    Container(gateway, "API Gateway", "Go, GraphQL", "Единая точка входа. Агрегация данных для клиентов, маршрутизация запросов.")
+
+    ' СЕРВИС ПОЛЬЗОВАТЕЛЕЙ
+    Container(auth_service, "User Service", "Go", "Управление пользователями, аутентификация")
+    ContainerDb(auth_db, "User DB", "PostgreSQL", "Хранение данных пользователей")
+
+    ' СЕРВИС КОНТЕНТА
+    Container(content_service, "Content Service", "Go", "Каталог фильмов, метаданные (жанры, актеры), видео")
+    ContainerDb(content_db, "Content DB", "PostgreSQL", "Хранение метаданных и ссылок на видео")
+
+    ' СЕРВИС БИЛЛИНГА
+    Container(billing_service, "Billing Service", "Go", "Подписки, скидки, история платежей")
+    ContainerDb(billing_db, "Billing DB", "PostgreSQL", "Данные о подписках и скидках")
+
+    ' СЕРВИС ВЗАИМОДЕЙСТВИЯ (ОЦЕНКИ/ИЗБРАННОЕ)
+    Container(interaction_service, "Interaction Service", "Go", "Оценки фильмов, папки избранного")
+    ContainerDb(interaction_db, "Interaction DB", "PostgreSQL", "Хранение оценок и избранного")
+
+    ' ОЧЕРЕДЬ СООБЩЕНИЙ
+    ContainerQueue(rabbitmq, "RabbitMQ", "AMQP", "Обмен событиями для рекомендаций")
+}
+
+' СВЯЗИ
+
+' Клиент -> Gateway
+Rel(user, gateway, "Запросы данных (GraphQL)", "HTTPS")
+
+' Gateway -> Микросервисы
+Rel(gateway, auth_service, "Авторизация, данные профиля", "gRPC/REST")
+Rel(gateway, content_service, "Запрос каталога фильмов", "gRPC/REST")
+Rel(gateway, billing_service, "Оформление подписки, статус", "gRPC/REST")
+Rel(gateway, interaction_service, "Поставить оценку, добавить в избранное", "gRPC/REST")
+
+' Связи сервисов с их базами данных
+Rel(auth_service, auth_db, "Read/Write", "SQL")
+Rel(content_service, content_db, "Read/Write", "SQL")
+Rel(billing_service, billing_db, "Read/Write", "SQL")
+Rel(interaction_service, interaction_db, "Read/Write", "SQL")
+
+' Внешние интеграции сервисов
+Rel(billing_service, payment_sys, "Проведение оплаты", "HTTPS")
+Rel(content_service, s3, "Загрузка/Получение ссылок на видео", "HTTPS")
+Rel(content_service, cinemas, "Интеграция контента", "HTTPS")
+
+' Рекомендательная система (Асинхронное взаимодействие)
+' Interaction Service знает о том, что пользователю понравилось, и шлет событие
+Rel(interaction_service, rabbitmq, "Событие: Оценка/Просмотр", "AMQP")
+Rel(rabbitmq, rec_sys, "Потребление событий", "AMQP")
+Rel(rec_sys, rabbitmq, "Готовая подборка", "AMQP")
+Rel(rabbitmq, content_service, "Получение ID рекомендованных фильмов", "AMQP")
+
+@enduml

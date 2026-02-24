@@ -1,0 +1,5 @@
+export { handleMovieEvents } from './handlers.js'
+export { MOVIE_EVENT_TYPES } from './topics.js'
+export type { MovieEventType } from './topics.js'
+export type { MovieEvent } from './types.js'
+export { movieRoutes } from './routes.js'

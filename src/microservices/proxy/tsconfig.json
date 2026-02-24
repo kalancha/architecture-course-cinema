@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+  }
+}
